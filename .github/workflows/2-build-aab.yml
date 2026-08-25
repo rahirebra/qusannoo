@@ -1,0 +1,66 @@
+name: 2 - Build signed AAB for Play Store
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli
+
+      - name: Decode keystore from secret
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > qusannoo-release.keystore
+
+      - name: Initialize TWA project from the hosted PWA manifest
+        run: |
+          bubblewrap init --manifest="${{ vars.PWA_URL }}/manifest.json" \
+            --directory=twa-project \
+            --skipPwaValidation \
+            <<EOF
+
+
+
+EOF
+        continue-on-error: true
+
+      - name: Point TWA project at the release keystore
+        run: |
+          cd twa-project
+          node -e "
+            const fs = require('fs');
+            const path = 'twa-manifest.json';
+            const m = JSON.parse(fs.readFileSync(path));
+            m.signingKey = { path: '../qusannoo-release.keystore', alias: 'qusannoo' };
+            fs.writeFileSync(path, JSON.stringify(m, null, 2));
+          "
+
+      - name: Build signed AAB
+        working-directory: twa-project
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          bubblewrap build --skipPwaValidation \
+            --password="$KEYSTORE_PASSWORD" \
+            --keyPassword="$KEY_PASSWORD"
+
+      - name: Upload signed AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: qusannoo-release-aab
+          path: twa-project/app-release-signed.aab
