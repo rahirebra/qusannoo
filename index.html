@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Qusannoo</title>
+<meta name="description" content="Qusannoo — a bilingual (English / Afaan Oromoo) personal expense tracker.">
+<meta name="theme-color" content="#4A2E1E">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="light">
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="mark">Qusannoo</div>
+      <div class="tag" data-t="tagline">your daily ledger</div>
+    </div>
+    <div class="header-controls">
+      <button class="pill-btn" id="langBtn">EN</button>
+      <button class="pill-btn" id="themeBtn">☾</button>
+    </div>
+  </header>
+
+  <section>
+    <div class="summary-row">
+      <div class="sum-card"><div class="amt" id="sumToday">0</div><div class="lbl" data-t="today">Today</div></div>
+      <div class="sum-card"><div class="amt" id="sumWeek">0</div><div class="lbl" data-t="week">This week</div></div>
+      <div class="sum-card"><div class="amt" id="sumMonth">0</div><div class="lbl" data-t="month">This month</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-t="addExpense">Add expense</h2>
+    <div class="card">
+      <form class="entry" id="entryForm">
+        <div class="row2">
+          <div class="field">
+            <label data-t="amount">Amount (ETB)</label>
+            <input type="number" id="fAmount" inputmode="decimal" step="0.01" min="0" required>
+          </div>
+          <div class="field">
+            <label data-t="date">Date</label>
+            <input type="date" id="fDate" required>
+          </div>
+        </div>
+        <div class="field">
+          <label data-t="category">Category</label>
+          <select id="fCategory"></select>
+        </div>
+        <div class="field">
+          <label data-t="note">Note (optional)</label>
+          <input type="text" id="fNote" maxlength="60">
+        </div>
+        <button type="submit" class="add-btn" data-t="addBtn">+ Add expense</button>
+      </form>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-t="budgetRings">Budget rings</h2>
+    <div class="rings-scroll" id="ringsScroll"></div>
+  </section>
+
+  <section>
+    <h2 data-t="breakdown">Category breakdown</h2>
+    <div class="card">
+      <div class="donut-wrap">
+        <svg id="donut" width="120" height="120" viewBox="0 0 120 120"></svg>
+        <div class="legend" id="legend"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <div class="settings-toggle" id="settingsToggle">
+        <h2 style="margin:0" data-t="budgets">Category budgets (monthly)</h2>
+        <span id="settingsCaret">▾</span>
+      </div>
+      <div class="budget-grid" id="budgetGrid" style="display:none;"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-t="recent">Recent entries</h2>
+    <div class="card">
+      <div class="entries-list" id="entriesList"></div>
+    </div>
+  </section>
+
+  <section>
+    <button class="export-btn" id="exportBtn" data-t="export">Export CSV</button>
+  </section>
+
+  <footer data-t="footer">Qusannoo — all data stays on this device</footer>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
