@@ -86,8 +86,8 @@ jobs:
               fingerprints: [],
               additionalTrustedOrigins: [],
               retainedBundles: [],
-              appVersionName: '1.0.0',
-              appVersionCode: 1,
+              appVersionName: '1.0.1',
+              appVersionCode: 2,
               signingKey: { path: './qusannoo-release.keystore', alias: 'qusannoo' },
               splashScreenFadeOutDuration: 300
             };
