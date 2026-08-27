@@ -96,7 +96,7 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: bubblewrap build --skipPwaValidation --password="$KEYSTORE_PASSWORD" --keyPassword="$KEY_PASSWORD"
+         run: printf 'n\n' | bubblewrap build --skipPwaValidation --password="$KEYSTORE_PASSWORD" --keyPassword="$KEY_PASSWORD"
 
       - name: Upload signed AAB
         uses: actions/upload-artifact@v4
