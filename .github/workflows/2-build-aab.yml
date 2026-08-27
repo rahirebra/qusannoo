@@ -26,27 +26,51 @@ jobs:
       - name: Decode keystore from secret
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > qusannoo-release.keystore
 
-      - name: Initialize TWA project from the hosted PWA manifest
+      - name: Write twa-manifest.json directly (skips interactive init)
         run: |
-          bubblewrap init --manifest="${{ vars.PWA_URL }}/manifest.json" \
-            --directory=twa-project \
-            --skipPwaValidation \
-            <<EOF
-
-
-
-EOF
-        continue-on-error: true
-
-      - name: Point TWA project at the release keystore
-        run: |
-          cd twa-project
+          mkdir -p twa-project
+          cp qusannoo-release.keystore twa-project/
           node -e "
             const fs = require('fs');
-            const path = 'twa-manifest.json';
-            const m = JSON.parse(fs.readFileSync(path));
-            m.signingKey = { path: '../qusannoo-release.keystore', alias: 'qusannoo' };
-            fs.writeFileSync(path, JSON.stringify(m, null, 2));
+            const pwaUrl = '${{ vars.PWA_URL }}';
+            const host = new URL(pwaUrl).host;
+            const manifest = {
+              packageId: 'com.qusannoo.app',
+              host: host,
+              name: 'Qusannoo',
+              launcherName: 'Qusannoo',
+              display: 'standalone',
+              themeColor: '#4A2E1E',
+              navigationColor: '#4A2E1E',
+              navigationColorDark: '#1C1712',
+              navigationDividerColor: '#4A2E1E',
+              navigationDividerColorDark: '#1C1712',
+              backgroundColor: '#F1E7D3',
+              enableNotifications: false,
+              startUrl: '/index.html',
+              iconUrl: pwaUrl + '/icons/icon-512.png',
+              maskableIconUrl: pwaUrl + '/icons/icon-512.png',
+              shortcuts: [],
+              generatorApp: 'bubblewrap-cli',
+              webManifestUrl: pwaUrl + '/manifest.json',
+              fallbackType: 'customtabs',
+              features: {},
+              alphaDependencies: { enabled: false },
+              enableSiteSettingsShortcut: true,
+              isChromeOSOnly: false,
+              isMetaQuest: false,
+              fullScopeUrl: pwaUrl + '/',
+              minSdkVersion: 21,
+              orientation: 'portrait',
+              fingerprints: [],
+              additionalTrustedOrigins: [],
+              retainedBundles: [],
+              appVersionName: '1.0.0',
+              appVersionCode: 1,
+              signingKey: { path: './qusannoo-release.keystore', alias: 'qusannoo' },
+              splashScreenFadeOutDuration: 300
+            };
+            fs.writeFileSync('twa-project/twa-manifest.json', JSON.stringify(manifest, null, 2));
           "
 
       - name: Build signed AAB
