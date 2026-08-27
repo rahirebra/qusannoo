@@ -1,4 +1,3 @@
-
 name: 2 - Build signed AAB for Play Store
 
 on:
@@ -28,8 +27,11 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Bubblewrap CLI
-        run: npm install -g @bubblewrap/cli
+      - name: Install Bubblewrap CLI and expect
+        run: |
+          npm install -g @bubblewrap/cli
+          sudo apt-get update -y
+          sudo apt-get install -y expect
 
       - name: Tell Bubblewrap where the JDK and Android SDK already are
         run: |
@@ -92,12 +94,28 @@ jobs:
             fs.writeFileSync('twa-project/twa-manifest.json', JSON.stringify(manifest, null, 2));
           "
 
+      - name: Write expect script to drive the interactive build
+        run: |
+          cat > drive-build.exp << 'EOF'
+          #!/usr/bin/expect -f
+          set timeout 600
+          spawn bubblewrap build --skipPwaValidation
+          expect "(Y/n)"
+          send "n\r"
+          expect "Password for the Key Store:"
+          send "$env(KEYSTORE_PASSWORD)\r"
+          expect "Password for the Key:"
+          send "$env(KEY_PASSWORD)\r"
+          expect eof
+          EOF
+          chmod +x drive-build.exp
+
       - name: Build signed AAB
         working-directory: twa-project
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: printf 'n\n%s\n%s\n' "$KEYSTORE_PASSWORD" "$KEY_PASSWORD" | bubblewrap build --skipPwaValidation
+        run: expect ../drive-build.exp
 
       - name: Upload signed AAB
         uses: actions/upload-artifact@v4
