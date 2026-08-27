@@ -30,6 +30,17 @@ jobs:
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli
 
+      - name: Tell Bubblewrap where the JDK and Android SDK already are
+        run: |
+          mkdir -p "$HOME/.bubblewrap"
+          cat > "$HOME/.bubblewrap/config.json" << EOF
+          {
+            "jdkPath": "$JAVA_HOME",
+            "androidSdkPath": "$ANDROID_HOME"
+          }
+          EOF
+          cat "$HOME/.bubblewrap/config.json"
+
       - name: Decode keystore from secret
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > qusannoo-release.keystore
 
