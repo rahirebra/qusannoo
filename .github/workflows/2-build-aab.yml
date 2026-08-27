@@ -94,9 +94,27 @@ jobs:
             fs.writeFileSync('twa-project/twa-manifest.json', JSON.stringify(manifest, null, 2));
           "
 
-      - name: Write expect script to drive the interactive build
+      - name: Generate the actual Android project files from the manifest
+        working-directory: twa-project
         run: |
-          cat > drive-build.exp << 'EOF'
+          cat > ../drive-update.exp << 'EOF'
+          #!/usr/bin/expect -f
+          set timeout 600
+          spawn bubblewrap update --skipPwaValidation
+          expect "(Y/n)"
+          send "y\r"
+          expect eof
+          EOF
+          chmod +x ../drive-update.exp
+          expect ../drive-update.exp
+
+      - name: Build signed AAB
+        working-directory: twa-project
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cat > ../drive-build.exp << 'EOF'
           #!/usr/bin/expect -f
           set timeout 600
           spawn bubblewrap build --skipPwaValidation
@@ -108,14 +126,8 @@ jobs:
           send "$env(KEY_PASSWORD)\r"
           expect eof
           EOF
-          chmod +x drive-build.exp
-
-      - name: Build signed AAB
-        working-directory: twa-project
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: expect ../drive-build.exp
+          chmod +x ../drive-build.exp
+          expect ../drive-build.exp
 
       - name: Upload signed AAB
         uses: actions/upload-artifact@v4
