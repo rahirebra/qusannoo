@@ -131,4 +131,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: qusannoo-release-aab
-          path: twa-project/app-release-signed.aab
+          path: twa-project/app-release-bundle.aab
