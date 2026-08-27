@@ -118,8 +118,6 @@ jobs:
           #!/usr/bin/expect -f
           set timeout 600
           spawn bubblewrap build --skipPwaValidation
-          expect "(Y/n)"
-          send "n\r"
           expect "Password for the Key Store:"
           send "$env(KEYSTORE_PASSWORD)\r"
           expect "Password for the Key:"
