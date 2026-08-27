@@ -2,6 +2,10 @@ name: 2 - Build signed AAB for Play Store
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/2-build-aab.yml'
 
 jobs:
   build:
