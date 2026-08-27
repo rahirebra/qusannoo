@@ -24,6 +24,9 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli
 
@@ -82,8 +85,7 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          yes | bubblewrap build --skipPwaValidation --password="$KEYSTORE_PASSWORD" --keyPassword="$KEY_PASSWORD"
+        run: bubblewrap build --skipPwaValidation --password="$KEYSTORE_PASSWORD" --keyPassword="$KEY_PASSWORD"
 
       - name: Upload signed AAB
         uses: actions/upload-artifact@v4
